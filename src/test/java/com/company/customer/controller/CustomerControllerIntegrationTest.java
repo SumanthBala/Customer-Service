@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.json.JSONException;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -44,6 +45,18 @@ public class CustomerControllerIntegrationTest {
 		return "http://localhost:" + port + uri;
 	}
 
+	@BeforeAll
+	public void loadCustomer() throws OAuthSystemException, OAuthProblemException {
+		String validToken = GenerateJwtToken.generateToken();
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Authorization", "Bearer " + validToken);
+		Customer customer = Customer.builder().firstName("Arun").lastName("Garimella")
+				.dateOfBirth(LocalDate.of(1992, 06, 14)).build();
+
+		HttpEntity<Customer> entity = new HttpEntity<>(customer, headers);
+
+		restTemplate.exchange(createURLWithPort(CUSTOMER_SERVICE_PATH), HttpMethod.POST, entity, Customer.class);
+	}
 
 	@Test
 	public void testAddCustomerWithoutOAuthToken() {
@@ -124,9 +137,10 @@ public class CustomerControllerIntegrationTest {
 		String expected = "[{\"firstName\":\"Arun\",\"lastName\":\"Garimella\",\"dateOfBirth\":\"1992-06-14\"}]";
 		JSONAssert.assertEquals(expected, response.getBody(), false);
 	}
-	
+
 	@Test
-	public void testRetrieveCustomersByNotExistedLastName() throws JSONException, OAuthSystemException, OAuthProblemException {
+	public void testRetrieveCustomersByNotExistedLastName()
+			throws JSONException, OAuthSystemException, OAuthProblemException {
 		String validToken = GenerateJwtToken.generateToken();
 		headers.set("Authorization", "Bearer " + validToken);
 		HttpEntity<String> entity = new HttpEntity<>(null, headers);
@@ -138,7 +152,7 @@ public class CustomerControllerIntegrationTest {
 
 		assertTrue(actual == 404);
 	}
-	
+
 	@Test
 	public void testAddCustomerWithInvalidFirstName() throws OAuthSystemException, OAuthProblemException {
 		String validToken = GenerateJwtToken.generateToken();
@@ -156,6 +170,7 @@ public class CustomerControllerIntegrationTest {
 		assertTrue(actual == 400);
 
 	}
+
 	@Test
 	public void testAddCustomerWithInvalidLastName() throws OAuthSystemException, OAuthProblemException {
 		String validToken = GenerateJwtToken.generateToken();
@@ -173,7 +188,7 @@ public class CustomerControllerIntegrationTest {
 		assertTrue(actual == 400);
 
 	}
-	
+
 	@Test
 	public void testAddCustomerWithoutProvidingAllRequiredFileds() throws OAuthSystemException, OAuthProblemException {
 		String validToken = GenerateJwtToken.generateToken();
@@ -189,6 +204,30 @@ public class CustomerControllerIntegrationTest {
 
 		assertTrue(actual == 400);
 
+	}
+
+	@Test
+	public void testAddingDuplicateCustomer() throws OAuthSystemException, OAuthProblemException {
+		String validToken = GenerateJwtToken.generateToken();
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Authorization", "Bearer " + validToken);
+
+		HttpEntity<String> httpEntity = new HttpEntity<>(null, headers);
+
+		ResponseEntity<String> initialResponse = restTemplate.exchange(createURLWithPort(CUSTOMER_SERVICE_PATH),
+				HttpMethod.GET, httpEntity, String.class);
+
+		Customer customer = Customer.builder().firstName("Arun").lastName("Garimella")
+				.dateOfBirth(LocalDate.of(1992, 06, 14)).build();
+
+		HttpEntity<Customer> entity = new HttpEntity<>(customer, headers);
+
+		restTemplate.exchange(createURLWithPort(CUSTOMER_SERVICE_PATH), HttpMethod.POST, entity, Customer.class);
+
+		ResponseEntity<String> finalResponse = restTemplate.exchange(createURLWithPort(CUSTOMER_SERVICE_PATH),
+				HttpMethod.GET, httpEntity, String.class);
+
+		assertTrue(initialResponse.getBody().equals(finalResponse.getBody()));
 	}
 
 }
