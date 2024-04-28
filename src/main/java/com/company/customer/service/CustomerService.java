@@ -19,8 +19,11 @@ public class CustomerService {
 	private CustomerRepository customerRepository;
 
 	public Customer addCustomer(Customer customer) {
-		customerRepository.save(CustomerEntity.builder().firstName(customer.getFirstName())
-				.lastName(customer.getLastName()).dateOfBirth(customer.getDateOfBirth()).build());
+		Optional<CustomerEntity> optional = customerRepository.getCustomer(customer.getFirstName(),
+				customer.getLastName(), customer.getDateOfBirth());
+		if (optional.isEmpty())
+			customerRepository.save(CustomerEntity.builder().firstName(customer.getFirstName())
+					.lastName(customer.getLastName()).dateOfBirth(customer.getDateOfBirth()).build());
 		return customer;
 	}
 
@@ -33,7 +36,7 @@ public class CustomerService {
 		Optional<List<CustomerEntity>> entityList = customerRepository.getCustomerByLastName(lastName);
 		if (entityList.isEmpty() || entityList.get().isEmpty())
 			throw new CustomerNotFoundException(lastName);
-		
+
 		return entityList.get().stream().map(c -> Customer.builder().firstName(c.getFirstName())
 				.lastName(c.getLastName()).dateOfBirth(c.getDateOfBirth()).build()).collect(Collectors.toList());
 	}
