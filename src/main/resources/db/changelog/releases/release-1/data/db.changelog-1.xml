@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<databaseChangeLog
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+			xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+			xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+	
+		<changeSet author="author.name" id="2 Inserted data in customer table">
+			<!-- Validations -->
+			<preConditions>
+				<tableExists tableName="CUSTOMER"/>
+			</preConditions>
+			<!-- Create Table -->
+			<sql>
+				INSERT INTO CUSTOMER VALUES (1, 'Arun', 'Garimella','1992-06-14')
+			</sql>
+			<comment>Inserted new record in table 'Customer'</comment>
+		</changeSet>
+	</databaseChangeLog>

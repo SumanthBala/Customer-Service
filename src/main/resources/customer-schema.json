@@ -1,0 +1,47 @@
+{
+   "definitions":{
+      
+   },
+   "$schema":"http://json-schema.org/draft-07/schema#",
+   "$id":"https://example.com/object1714187996.json",
+   "title":"Root",
+   "type":"object",
+   "required":[
+      "firstName",
+      "lastName",
+      "dateOfBirth"
+   ],
+   "properties":{
+      "firstName":{
+         "$id":"#root/firstName",
+         "title":"Firstname",
+         "type":"string",
+         "default":"",
+         "examples":[
+            "String"
+         ],
+         "pattern":"^[a-zA-Z]+$",
+         "errorMessage": "The 'firstName' field must contain only alphabetic characters."
+      },
+      "lastName":{
+         "$id":"#root/lastName",
+         "title":"Lastname",
+         "type":"string",
+         "default":"",
+         "examples":[
+            "String"
+         ],
+         "pattern":"^[a-zA-Z]+$",
+         "errorMessage": "The 'lastName' field must contain only alphabetic characters."
+      },
+      "dateOfBirth":{
+         "type":"array",
+         "items":{
+            "type":"integer",
+            "format":"date",
+            "example":"1990-01-01",
+            "pattern":"^\\d{4}-\\d{2}-\\d{2}$"
+         }
+      }
+   }
+}
